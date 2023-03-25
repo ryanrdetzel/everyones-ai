@@ -97,12 +97,12 @@ export default function Prompt({ navigation, route }) {
     Keyboard.dismiss();
 
     const response = await chatRequest(text, params, newMessages);
-    if (response !== null) {
+    if (response.content) {
       setChatHistory((prevState) => [
         ...prevState,
         {
           id: uuid.v4(),
-          content: response,
+          content: response.content,
           role: "assistant",
         },
       ]);
@@ -118,8 +118,7 @@ export default function Prompt({ navigation, route }) {
           lastUserMessage,
           {
             id: uuid.v4(),
-            content:
-              "Sorry, there seems to be a problem with the server. Try again later.",
+            content: response.error,
             role: "app",
             type: "error",
           },
@@ -197,12 +196,11 @@ export default function Prompt({ navigation, route }) {
 
   return (
     <View style={styles.container1}>
-      <Text key="first" style={styles.topMessage}>
-        {params.conversation &&
-          "This is a conversation, each new message is a response to the previous message. "}
-        {!params.conversation &&
-          "Each message is indepedent of the previous message."}
-      </Text>
+      {chatHistory.length <= 1 && (
+        <Text key="first" style={styles.topMessage}>
+          {params.intro}
+        </Text>
+      )}
       <ScrollView
         style={styles.scrollView}
         ref={scrollRef}
@@ -295,8 +293,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   topMessage: {
-    padding: 10,
-    fontSize: 14,
+    padding: 20,
+    paddingVertical: 30,
+    fontSize: 16,
+    verticalAlign: "middle",
     textAlign: "center",
   },
   container1: {

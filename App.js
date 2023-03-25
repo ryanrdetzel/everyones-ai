@@ -8,6 +8,7 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Prompt from "./Prompt";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+import Settings from "./Settings";
 
 const Drawer = createDrawerNavigator();
 
@@ -16,14 +17,16 @@ export default function App() {
     {
       id: "tell-me-a-story",
       title: "Tell me a story",
-      conversation: false,
+      intro:
+        "The AI will tell you a story.\nGive details, ask questions, be creative!",
       prompt:
         "You're a story teller, you're creative and you're good at it. Tell me a story about in one sentence about ",
     },
     {
       id: "2",
       title: "Research",
-      conversation: true,
+      intro:
+        "The AI is your personal research assistant. Define what you want it to research, follow up with questions, and it will provide you with the information you need.",
       prompt: "I'm trying to learn as much as I can about ",
     },
     {
@@ -58,6 +61,7 @@ export default function App() {
       id: "7",
       title: "DIY Expert",
       conversation: true,
+      intro: "DIY",
       prompt:
         "I want you to act as a DIY expert. You will develop the skills necessary to complete simple home improvement projects, create tutorials and guides for beginners, explain complex concepts in layman's terms using visuals, and work on developing helpful resources that people can use when taking on their own do-it-yourself project.",
     },
@@ -95,18 +99,35 @@ export default function App() {
     <ActionSheetProvider>
       <NavigationContainer>
         <Drawer.Navigator
-          initialRouteName="Prompt"
+          initialRouteName="tell-me-a-story"
           screenOptions={{
-            drawerStyle: styles.sideDrawer,
+            // drawerStyle: styles.sideDrawer,
+            swipeEdgeWidth: 250,
           }}
         >
+          <Drawer.Screen
+            name="Settings"
+            component={Settings}
+            key="settings"
+            options={{
+              drawerItemStyle: styles.settingsDrawerLabel,
+              drawerLabelStyle: { fontWeight: "bold" },
+              drawerIcon: ({ focused, size }) => (
+                <MaterialIcons name="settings" size={size} color="#ccc" />
+              ),
+            }}
+          />
           {prompts.map((prompt) => (
             <Drawer.Screen
-              name={prompt.title}
+              name={prompt.id}
               component={Prompt}
               key={prompt.id}
               initialParams={prompt}
               options={{
+                title: prompt.title,
+                // drawerIcon: ({ focused, size }) => (
+                //   <MaterialIcons name="info-outline" size={size} color="#ccc" />
+                // ),
                 headerRight: () => (
                   <Pressable
                     style={styles.iconButton}
@@ -130,6 +151,10 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     margin: 2,
+  },
+  settingsDrawerLabel: {
+    backgroundColor: "#f3f4f6",
+    marginBottom: 20,
   },
   iconButton: {
     marginRight: 8,

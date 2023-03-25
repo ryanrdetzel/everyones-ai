@@ -1,7 +1,17 @@
-import { OPENAI_KEY } from "@env";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import { getSettings } from "./Settings";
 
 export async function chatRequest(system, params, messages) {
   const isConversation = params.conversation;
+
+  const settings = await getSettings();
+
+  if (settings === null || !settings.openaiKey || settings.openaiKey === "") {
+    return {
+      error: "No API key set, please check your settings.",
+    };
+  }
 
   const cleanMessages = messages.map((message) => {
     return {
@@ -30,16 +40,17 @@ export async function chatRequest(system, params, messages) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + OPENAI_KEY,
+        Authorization: "Bearer " + settings.openaiKey,
       },
       body: JSON.stringify(payload),
     });
 
     const json = await response.json();
     const content = json.choices[0].message.content;
-    return content;
+    return { content };
   } catch (error) {
-    // console.log(error);
-    return null;
+    return {
+      error: "Could not connect to OpenAI API",
+    };
   }
 }
