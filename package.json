@@ -1,5 +1,5 @@
 {
-  "name": "everyones.ai",
+  "name": "everyones-ai",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
@@ -9,13 +9,32 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/webpack-config": "^18.0.1",
+    "@react-native-async-storage/async-storage": "1.17.11",
+    "@react-navigation/drawer": "^6.6.2",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "expo": "~48.0.9",
     "expo-status-bar": "~1.4.4",
+    "openai": "^3.2.1",
     "react": "18.2.0",
-    "react-native": "0.71.4"
+    "react-dom": "18.2.0",
+    "react-native": "0.71.4",
+    "react-native-gesture-handler": "~2.9.0",
+    "react-native-reanimated": "~2.14.4",
+    "react-native-uuid": "^2.0.1",
+    "react-native-web": "~0.18.10"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "eslint": "^8.36.0",
+    "eslint-config-semistandard": "^17.0.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-native": "^4.0.0",
+    "react-native-dotenv": "^3.4.8"
   },
   "private": true
 }

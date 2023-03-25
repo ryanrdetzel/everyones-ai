@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "everyones.ai",
-    "slug": "everyones.ai",
+    "slug": "everyones-ai",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +25,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fbcbadfa-d35a-431c-9660-91fb31cc1349"
+      }
     }
   }
 }
