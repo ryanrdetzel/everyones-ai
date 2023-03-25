@@ -121,6 +121,7 @@ export default function Prompt({ navigation, route }) {
             content:
               "Sorry, there seems to be a problem with the server. Try again later.",
             role: "app",
+            type: "error",
           },
         ];
       });
@@ -213,13 +214,10 @@ export default function Prompt({ navigation, route }) {
             .map((item) => {
               let chatStyle = styles.chatSend;
               switch (item.role) {
-                case "user":
-                  chatStyle = styles.chatSend;
-                  break;
                 case "assistant":
                   chatStyle = styles.chatRec;
                   break;
-                default:
+                case "app":
                   chatStyle = styles.chatAppError;
               }
               return (
@@ -244,6 +242,15 @@ export default function Prompt({ navigation, route }) {
             <ActivityIndicator size="large" />
           </View>
         )}
+        {chatHistory.length > 1 && !isWorking && (
+          <View style={styles.newConvoButton}>
+            <Button
+              title="Start New Conversation"
+              disabled={isWorking}
+              onPress={newConversation}
+            />
+          </View>
+        )}
       </ScrollView>
       <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={height}>
         <TextInput
@@ -260,12 +267,16 @@ export default function Prompt({ navigation, route }) {
           value={text}
         />
         <View style={styles.buttons}>
-          <Button
-            title="Clear"
+          {/* <Button
+            title="Clear History"
             disabled={isWorking}
             onPress={newConversation}
+          /> */}
+          <Button
+            title="Send Message"
+            disabled={isWorking}
+            onPress={sendChat}
           />
-          <Button title="Send" disabled={isWorking} onPress={sendChat} />
         </View>
       </KeyboardAvoidingView>
     </View>
@@ -307,11 +318,18 @@ const styles = StyleSheet.create({
   item: {
     padding: 10,
     fontSize: 18,
+    textAlign: "left",
+  },
+  newConvoButton: {
+    marginBottom: 5,
   },
   buttons: {
     flexDirection: "row",
     justifyContent: "space-between",
-    padding: 15,
+    paddingBottom: 30,
+    paddingHorizontal: 15,
+    paddingTop: 10,
+    marginLeft: "auto",
   },
   chatSend: {
     backgroundColor: "#f8fafc",

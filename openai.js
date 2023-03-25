@@ -18,7 +18,6 @@ export async function chatRequest(system, params, messages) {
     ? onlySystem.concat(cleanMessages[cleanMessages.length - 1])
     : cleanMessages;
 
-  console.log(filteredMessages);
   const payload = {
     model: "gpt-3.5-turbo",
     messages: filteredMessages,
