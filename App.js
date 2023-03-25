@@ -7,6 +7,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Prompt from "./Prompt";
+import { ActionSheetProvider } from "@expo/react-native-action-sheet";
 
 const Drawer = createDrawerNavigator();
 
@@ -91,34 +92,36 @@ export default function App() {
   ];
 
   return (
-    <NavigationContainer>
-      <Drawer.Navigator
-        initialRouteName="Prompt"
-        screenOptions={{
-          drawerStyle: styles.sideDrawer,
-        }}
-      >
-        {prompts.map((prompt) => (
-          <Drawer.Screen
-            name={prompt.title}
-            component={Prompt}
-            key={prompt.id}
-            initialParams={prompt}
-            options={{
-              headerRight: () => (
-                <Pressable
-                  style={styles.iconButton}
-                  onPress={() => alert("This is a button!")}
-                >
-                  <MaterialIcons name="info-outline" size={24} color="#ccc" />
-                </Pressable>
-              ),
-            }}
-          />
-        ))}
-      </Drawer.Navigator>
-      <StatusBar style="auto" />
-    </NavigationContainer>
+    <ActionSheetProvider>
+      <NavigationContainer>
+        <Drawer.Navigator
+          initialRouteName="Prompt"
+          screenOptions={{
+            drawerStyle: styles.sideDrawer,
+          }}
+        >
+          {prompts.map((prompt) => (
+            <Drawer.Screen
+              name={prompt.title}
+              component={Prompt}
+              key={prompt.id}
+              initialParams={prompt}
+              options={{
+                headerRight: () => (
+                  <Pressable
+                    style={styles.iconButton}
+                    onPress={() => alert("This is a button!")}
+                  >
+                    <MaterialIcons name="info-outline" size={24} color="#ccc" />
+                  </Pressable>
+                ),
+              }}
+            />
+          ))}
+        </Drawer.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </ActionSheetProvider>
   );
 }
 

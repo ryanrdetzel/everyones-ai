@@ -26,17 +26,21 @@ export async function chatRequest(system, params, messages) {
     max_tokens: 100,
   };
 
-  //TODO ADD TRY/catch
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + OPENAI_KEY,
-    },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + OPENAI_KEY,
+      },
+      body: JSON.stringify(payload),
+    });
 
-  const json = await response.json();
-  const content = json.choices[0].message.content;
-  return content;
+    const json = await response.json();
+    const content = json.choices[0].message.content;
+    return content;
+  } catch (error) {
+    // console.log(error);
+    return null;
+  }
 }

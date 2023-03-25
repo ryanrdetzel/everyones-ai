@@ -9,16 +9,21 @@ import {
   ScrollView,
   Keyboard,
   ActivityIndicator,
+  Pressable,
 } from "react-native";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { chatRequest } from "./openai";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { useActionSheet } from "@expo/react-native-action-sheet";
+import * as Clipboard from "expo-clipboard";
 
 import uuid from "react-native-uuid";
 
 const storeData = async (key, value) => {
-  const data = JSON.stringify(value);
-  console.log(`Saving ${key} ` + data);
+  const filtered = value.filter((i) => i.role !== "app");
+  const data = JSON.stringify(filtered);
+
   try {
     await AsyncStorage.setItem(key, data);
   } catch (e) {
@@ -30,7 +35,6 @@ const getData = async (key) => {
   try {
     const value = await AsyncStorage.getItem(key);
     if (value !== null) {
-      console.log(`Found ${key}: ` + value);
       return JSON.parse(value);
     }
   } catch (e) {
@@ -40,15 +44,19 @@ const getData = async (key) => {
 };
 
 export default function Prompt({ navigation, route }) {
-  const [text, setText] = React.useState("");
+  const [text, setText] = React.useState(null);
   const [isWorking, setIsWorking] = React.useState(false);
 
   const [chatHistory, setChatHistory] = React.useState([]);
 
   const [selectedId, setSelectedId] = React.useState();
+
+  const { showActionSheetWithOptions } = useActionSheet();
   const height = useHeaderHeight();
 
   const scrollRef = React.useRef();
+  const textRef = React.useRef();
+
   const params = route.params;
 
   const newConversation = () => {
@@ -61,10 +69,22 @@ export default function Prompt({ navigation, route }) {
     ]);
   };
 
+  const resendMessage = async (message) => {
+    // Remove this message from the chat history and then send it again
+    const filtered = chatHistory.filter((i) => i.id !== message.id);
+    setChatHistory(filtered);
+    setText(message.content);
+    textRef.current?.focus();
+  };
+
   const sendChat = async () => {
     setIsWorking(true);
+
+    // remove any app messages
+    const filtered = chatHistory.filter((i) => i.role !== "app");
+
     const newMessages = [
-      ...chatHistory,
+      ...filtered,
       {
         id: uuid.v4(),
         content: text,
@@ -76,17 +96,35 @@ export default function Prompt({ navigation, route }) {
     setText("");
     Keyboard.dismiss();
 
-    // Save history to local storage
     const response = await chatRequest(text, params, newMessages);
+    if (response !== null) {
+      setChatHistory((prevState) => [
+        ...prevState,
+        {
+          id: uuid.v4(),
+          content: response,
+          role: "assistant",
+        },
+      ]);
+    } else {
+      setChatHistory((prevState) => {
+        // Add canRefresh to the last user message and then add the error message
+        const lastUserMessage = prevState[prevState.length - 1];
+        lastUserMessage.canRefresh = true;
+        const adjustedPrevState = prevState.slice(0, -1);
 
-    setChatHistory((prevState) => [
-      ...prevState,
-      {
-        id: uuid.v4(),
-        content: response,
-        role: "assistant",
-      },
-    ]);
+        return [
+          ...adjustedPrevState,
+          lastUserMessage,
+          {
+            id: uuid.v4(),
+            content:
+              "Sorry, there seems to be a problem with the server. Try again later.",
+            role: "app",
+          },
+        ];
+      });
+    }
 
     setIsWorking(false);
     scrollRef.current?.scrollToEnd({ animated: true });
@@ -95,8 +133,6 @@ export default function Prompt({ navigation, route }) {
   React.useEffect(() => {
     if (chatHistory.length > 0) {
       scrollRef.current?.scrollToEnd({ animated: true });
-      console.log(" *********** CHAT HISTORY CHANGE");
-      console.log(chatHistory);
       storeData(`history-${params.id}-current`, chatHistory);
     }
   }, [chatHistory]);
@@ -127,6 +163,37 @@ export default function Prompt({ navigation, route }) {
     };
   }, []);
 
+  const onPress = (item) => {
+    const options = ["Delete", "Copy Message", "Edit Messsage", "Cancel"];
+    const destructiveButtonIndex = 0;
+    const cancelButtonIndex = 2;
+
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex,
+        destructiveButtonIndex,
+      },
+      (selectedIndex: number) => {
+        switch (selectedIndex) {
+          case 1: //Copy
+            Clipboard.setStringAsync(item.content);
+            break;
+          case 1: //Edit
+            setText(item.content);
+            textRef.current?.focus();
+            break;
+          case destructiveButtonIndex:
+            // Delete the message from the chat history
+            const filtered = chatHistory.filter((i) => i.id !== item.id);
+            setChatHistory(filtered);
+            break;
+          case cancelButtonIndex:
+        }
+      }
+    );
+  };
+
   return (
     <View style={styles.container1}>
       <Text key="first" style={styles.topMessage}>
@@ -144,11 +211,30 @@ export default function Prompt({ navigation, route }) {
           {chatHistory
             .filter((i) => i.role !== "system")
             .map((item) => {
-              const chatStyle =
-                item.role === "user" ? styles.chatSend : styles.chatRec;
+              let chatStyle = styles.chatSend;
+              switch (item.role) {
+                case "user":
+                  chatStyle = styles.chatSend;
+                  break;
+                case "assistant":
+                  chatStyle = styles.chatRec;
+                  break;
+                default:
+                  chatStyle = styles.chatAppError;
+              }
               return (
                 <View key={item.id} style={chatStyle}>
-                  <Text style={styles.item}>{item.content}</Text>
+                  <Pressable onLongPress={() => onPress(item)}>
+                    <Text style={styles.item}>{item.content}</Text>
+                  </Pressable>
+                  {item.canRefresh && (
+                    <Pressable
+                      style={styles.refreshButton}
+                      onPress={() => resendMessage(item)}
+                    >
+                      <MaterialIcons name="refresh" size={24} color="#ccc" />
+                    </Pressable>
+                  )}
                 </View>
               );
             })}
@@ -163,7 +249,9 @@ export default function Prompt({ navigation, route }) {
         <TextInput
           multiline={true}
           numberOfLines={20}
+          ref={textRef}
           style={styles.input}
+          placeholder="Type your message..."
           onChangeText={(e) => {
             if (!isWorking) {
               setText(e);
@@ -185,6 +273,12 @@ export default function Prompt({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  refreshButton: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    padding: 2,
+  },
   scrollView: {
     flex: 1,
     backgroundColor: "#fff",
@@ -227,6 +321,12 @@ const styles = StyleSheet.create({
   },
   chatRec: {
     backgroundColor: "#E5E5EA",
+    borderRadius: 10,
+    margin: 10,
+    padding: 10,
+  },
+  chatAppError: {
+    backgroundColor: "#fee2e2",
     borderRadius: 10,
     margin: 10,
     padding: 10,
