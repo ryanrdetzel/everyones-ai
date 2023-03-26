@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     marginLeft: "auto",
   },
   chatSend: {
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#e0f2fe",
     borderRadius: 10,
     margin: 10,
     padding: 10,
