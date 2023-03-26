@@ -18,12 +18,19 @@ import Home from "./Home";
 
 const Drawer = createDrawerNavigator();
 
+const generalPrompt = {
+  id: "general-chat",
+  title: "General Chat",
+  prompt:
+    "You're the smartest AI in the world. You know everything and respond to everything. Lets chat.",
+  enabled: true,
+};
+
 export const getEnabledPrompts = async () => {
   try {
     const value = await AsyncStorage.getItem("prompts");
     if (value !== null) {
       const promptsObj = JSON.parse(value);
-      // convert a prompts object to an array
       return Object.keys(promptsObj).map((key) => {
         return { ...promptsObj[key] };
       });
@@ -90,6 +97,15 @@ export default function App() {
             }}
           />
           <Drawer.Group>
+            <Drawer.Screen
+              name={generalPrompt.id}
+              component={Prompt}
+              key={generalPrompt.id}
+              initialParams={{ prompt: generalPrompt }}
+              options={{
+                title: generalPrompt.title,
+              }}
+            />
             {prompts.map((prompt) => (
               <Drawer.Screen
                 name={prompt.id}

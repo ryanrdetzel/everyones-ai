@@ -69,7 +69,7 @@ export default function Prompt({ navigation, route }) {
   };
 
   const tellMeMore = () => {
-    sendChat(null, "Tell me know");
+    sendChat(null, "Continue your thought");
   };
 
   const resendMessage = async (message) => {
@@ -142,7 +142,7 @@ export default function Prompt({ navigation, route }) {
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
-      scrollRef.current?.scrollToEnd({ animated: true });
+      scrollRef.current?.scrollToEnd({ animated: false });
       let getHistory = await getData(`history-${params.id}-current`);
       if (getHistory.length === 0) {
         newConversation();

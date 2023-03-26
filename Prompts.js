@@ -11,9 +11,9 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
-import { prompts } from "./prompt-data";
+import { prompts, initialPrompts } from "./prompt-data";
 
-const saveEnabledPrompts = async (value) => {
+export const saveEnabledPrompts = async (value) => {
   const data = JSON.stringify(value);
   try {
     await AsyncStorage.setItem("prompts", data);
@@ -65,42 +65,42 @@ function PublicPrompList({ enabledPrompts }) {
   };
 
   return (
-    <ScrollView style={styles.scrollView}>
-      <View>
-        {currentPrompts.map((prompt) => {
-          return (
-            <Pressable
-              key={prompt.id}
-              onPress={() => togglePrompt(prompt)}
-              style={({ pressed }) => [
-                {
-                  padding: 20,
-                  marginBotton: 10,
-                  backgroundColor: pressed
-                    ? "#f3f4f6"
-                    : prompt.enabled
-                    ? "#e0f2fe"
-                    : "white",
-                },
-                styles.wrapperCustom,
-              ]}
-            >
-              <Text style={{ fontWeight: 600 }}>
-                {prompt.title}{" "}
-                {prompt.enabled && (
-                  <MaterialCommunityIcons
-                    name="checkbox-marked-circle-outline"
-                    size={14}
-                    color="#075985"
-                  />
-                )}
-              </Text>
+    <ScrollView style={styles.scrollView} scrollIndicatorInsets={{ right: 1 }}>
+      {/* <View> */}
+      {currentPrompts.map((prompt) => {
+        return (
+          <Pressable
+            key={prompt.id}
+            onPress={() => togglePrompt(prompt)}
+            style={({ pressed }) => [
+              {
+                padding: 20,
+                marginBotton: 10,
+                backgroundColor: pressed
+                  ? "#f3f4f6"
+                  : prompt.enabled
+                  ? "#e0f2fe"
+                  : "white",
+              },
+              styles.wrapperCustom,
+            ]}
+          >
+            <Text style={{ fontWeight: 600 }}>
+              {prompt.title}{" "}
+              {prompt.enabled && (
+                <MaterialCommunityIcons
+                  name="checkbox-marked-circle-outline"
+                  size={14}
+                  color="#075985"
+                />
+              )}
+            </Text>
 
-              <Text>{prompt.prompt}</Text>
-            </Pressable>
-          );
-        })}
-      </View>
+            <Text>{prompt.prompt}</Text>
+          </Pressable>
+        );
+      })}
+      {/* </View> */}
     </ScrollView>
   );
 }
@@ -110,7 +110,7 @@ export default function Prompts({ navigation }) {
 
   React.useEffect(() => {
     const unsubscribe = navigation.addListener("focus", async () => {
-      const tmpPromptObj = await getEnabledPrompts();
+      let tmpPromptObj = await getEnabledPrompts();
       setEnabledPrompts(tmpPromptObj);
     });
     return unsubscribe;
@@ -133,13 +133,12 @@ export default function Prompts({ navigation }) {
 
 const styles = StyleSheet.create({
   scrollView: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: "#fff",
-    marginBottom: 30,
+    // marginBottom: 30,
   },
   container: {
     flex: 1,
-    // margin: 10,
     fontSize: 18,
   },
   apiKeyInput: {

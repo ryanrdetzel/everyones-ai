@@ -4,6 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 
 import { getSettings } from "./Settings";
+import { prompts, initialPrompts } from "./prompt-data";
+import { saveEnabledPrompts } from "./Prompts";
 
 export default function Home({ navigation }) {
   const localImage = require("./assets/icon.png");
@@ -21,6 +23,21 @@ export default function Home({ navigation }) {
         setApiSet(false);
       } else {
         setApiSet(true);
+      }
+
+      /* First time users get a few prompts to get started */
+      // await AsyncStorage.removeItem("hasLaunched");
+      const hasLaunched = await AsyncStorage.getItem("hasLaunched");
+      if (!hasLaunched) {
+        let tmpPromptObj = {};
+        initialPrompts.map((p) => {
+          tmpPromptObj = {
+            ...tmpPromptObj,
+            [p]: prompts.find((prompt) => prompt.id === p),
+          };
+        });
+        saveEnabledPrompts(tmpPromptObj);
+        await AsyncStorage.setItem("hasLaunched", "true");
       }
     });
     return unsubscribe;

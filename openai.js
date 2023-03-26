@@ -35,7 +35,7 @@ export async function chatRequest(system, params, messages) {
     model: "gpt-3.5-turbo",
     messages: cleanMessages,
     temperature: 0.7,
-    max_tokens: 100,
+    // max_tokens: 100,
   };
 
   try {

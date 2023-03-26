@@ -1,3 +1,12 @@
+// First time user prompts
+export const initialPrompts = [
+  "tell-me-a-story",
+  "research",
+  "ask-a-historian",
+  "give-me-some-ideas",
+];
+
+// Available prompts, this should be pull from the web
 export const prompts = [
   {
     id: "tell-me-a-story",
