@@ -1,2 +1,5 @@
-- Save history
--
+- Save/Get history if cleared
+- Export history
+- Allow user to change token
+- Allow user to change temperature
+- Allow them to request more info

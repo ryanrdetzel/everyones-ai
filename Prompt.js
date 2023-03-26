@@ -46,7 +46,6 @@ const getData = async (key) => {
 export default function Prompt({ navigation, route }) {
   const [text, setText] = React.useState(null);
   const [isWorking, setIsWorking] = React.useState(false);
-
   const [chatHistory, setChatHistory] = React.useState([]);
 
   const [selectedId, setSelectedId] = React.useState();
@@ -57,7 +56,7 @@ export default function Prompt({ navigation, route }) {
   const scrollRef = React.useRef();
   const textRef = React.useRef();
 
-  const params = route.params;
+  const params = route.params.prompt;
 
   const newConversation = () => {
     setChatHistory([
@@ -198,7 +197,9 @@ export default function Prompt({ navigation, route }) {
     <View style={styles.container1}>
       {chatHistory.length <= 1 && (
         <Text key="first" style={styles.topMessage}>
-          {params.intro}
+          <Text style={{ fontWeight: 600 }}>Prompt</Text>
+          {"\n\n"}
+          {params.prompt}
         </Text>
       )}
       <ScrollView
@@ -293,7 +294,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   topMessage: {
-    padding: 20,
+    padding: 25,
+    // margin: 20,
     paddingVertical: 30,
     fontSize: 16,
     verticalAlign: "middle",

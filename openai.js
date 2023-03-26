@@ -20,9 +20,16 @@ export async function chatRequest(system, params, messages) {
     };
   });
 
-  const onlySystem = cleanMessages.filter((message) => {
-    return message.role === "system";
-  });
+  const onlySystem = cleanMessages
+    .filter((message) => {
+      return message.role === "system";
+    })
+    .map((message) => {
+      return {
+        ...message,
+        role: "user",
+      };
+    });
 
   const filteredMessages = !isConversation
     ? onlySystem.concat(cleanMessages[cleanMessages.length - 1])

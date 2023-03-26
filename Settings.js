@@ -47,7 +47,7 @@ export default function Settings({ navigation }) {
         here:
       </Text>
       <Text
-        style={{ color: "#075985", paddingBottom: 20 }}
+        style={{ color: "#0284c7", paddingBottom: 20 }}
         onPress={() => Linking.openURL("https://platform.openai.com/overview")}
       >
         OpenAI Developers
@@ -56,7 +56,7 @@ export default function Settings({ navigation }) {
         Once you have an OpenAI account you can create an API key here:
       </Text>
       <Text
-        style={{ color: "#075985", paddingBottom: 20 }}
+        style={{ color: "#0284c7", paddingBottom: 20 }}
         onPress={() =>
           Linking.openURL("https://platform.openai.com/account/api-keys")
         }
@@ -64,7 +64,7 @@ export default function Settings({ navigation }) {
         https://platform.openai.com/account/api-keys
       </Text>
 
-      <Text>Past your OpenAI API Key below</Text>
+      <Text>Paste your OpenAI API Key below</Text>
       <TextInput
         style={styles.apiKeyInput}
         onChangeText={saveKey}

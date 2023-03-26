@@ -9,10 +9,12 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { createDrawerNavigator, DrawerItem } from "@react-navigation/drawer";
-import Prompt from "./Prompt";
 import { ActionSheetProvider } from "@expo/react-native-action-sheet";
+
+import Prompt from "./Prompt";
 import Settings from "./Settings";
 import Prompts from "./Prompts";
+import Home from "./Home";
 
 const Drawer = createDrawerNavigator();
 
@@ -36,27 +38,40 @@ export default function App() {
   const [prompts, setPrompts] = React.useState([]);
 
   const updatePromps = async () => {
-    const p = await getEnabledPrompts();
-    const sortedPrompts = p.sort((a, b) => a.title.localeCompare(b.title));
-    setPrompts(sortedPrompts);
+    const allArompts = await getEnabledPrompts();
+    const sortedPrompts = allArompts
+      .filter((p) => p && p.title)
+      .sort((a, b) => a?.title.localeCompare(b?.title));
+    setPrompts(allArompts);
   };
 
   return (
     <ActionSheetProvider>
       <NavigationContainer onStateChange={(state) => updatePromps()}>
         <Drawer.Navigator
-          initialRouteName="tell-me-a-story"
+          initialRouteName="home"
           screenOptions={{
             swipeEdgeWidth: 250,
           }}
         >
+          <Drawer.Screen
+            name="Home"
+            component={Home}
+            key="home"
+            options={{
+              drawerItemStyle: styles.settingsDrawerLabel,
+              drawerIcon: ({ focused, size }) => (
+                <MaterialIcons name="home" size={size} color="#ccc" />
+              ),
+            }}
+          />
+
           <Drawer.Screen
             name="Settings"
             component={Settings}
             key="settings"
             options={{
               drawerItemStyle: styles.settingsDrawerLabel,
-              drawerLabelStyle: { fontWeight: "bold" },
               drawerIcon: ({ focused, size }) => (
                 <MaterialIcons name="settings" size={size} color="#ccc" />
               ),
@@ -68,7 +83,7 @@ export default function App() {
             key="prompts"
             options={{
               drawerItemStyle: styles.promptsDrawerLabel,
-              drawerLabelStyle: { fontWeight: "bold" },
+              drawerLabelStyle: {},
               drawerIcon: ({ focused, size }) => (
                 <MaterialCommunityIcons name="robot" size={size} color="#ccc" />
               ),
@@ -80,21 +95,9 @@ export default function App() {
                 name={prompt.id}
                 component={Prompt}
                 key={prompt.id}
-                initialParams={prompt}
+                initialParams={{ prompt }}
                 options={{
                   title: prompt.title,
-                  headerRight: () => (
-                    <Pressable
-                      style={styles.iconButton}
-                      onPress={() => alert("This is a button!")}
-                    >
-                      <MaterialIcons
-                        name="info-outline"
-                        size={24}
-                        color="#ccc"
-                      />
-                    </Pressable>
-                  ),
                 }}
               />
             ))}
