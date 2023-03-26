@@ -68,6 +68,10 @@ export default function Prompt({ navigation, route }) {
     ]);
   };
 
+  const tellMeMore = () => {
+    sendChat(null, "Tell me know");
+  };
+
   const resendMessage = async (message) => {
     // Remove this message from the chat history and then send it again
     const filtered = chatHistory.filter((i) => i.id !== message.id);
@@ -76,17 +80,17 @@ export default function Prompt({ navigation, route }) {
     textRef.current?.focus();
   };
 
-  const sendChat = async () => {
+  const sendChat = async (e, forceMessage) => {
     setIsWorking(true);
 
-    // remove any app messages
+    const messageText = forceMessage || text;
     const filtered = chatHistory.filter((i) => i.role !== "app");
 
     const newMessages = [
       ...filtered,
       {
         id: uuid.v4(),
-        content: text,
+        content: messageText,
         role: "user",
       },
     ];
@@ -244,9 +248,15 @@ export default function Prompt({ navigation, route }) {
         {chatHistory.length > 1 && !isWorking && (
           <View style={styles.newConvoButton}>
             <Button
-              title="Start New Conversation"
+              title="Start new conversation"
               disabled={isWorking}
               onPress={newConversation}
+              style={{ fontSize: 12 }}
+            />
+            <Button
+              title="Tell me more"
+              disabled={isWorking}
+              onPress={tellMeMore}
             />
           </View>
         )}
@@ -324,6 +334,9 @@ const styles = StyleSheet.create({
   },
   newConvoButton: {
     marginBottom: 5,
+    marginHorizontal: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   buttons: {
     flexDirection: "row",

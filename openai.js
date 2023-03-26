@@ -31,13 +31,9 @@ export async function chatRequest(system, params, messages) {
       };
     });
 
-  const filteredMessages = !isConversation
-    ? onlySystem.concat(cleanMessages[cleanMessages.length - 1])
-    : cleanMessages;
-
   const payload = {
     model: "gpt-3.5-turbo",
-    messages: filteredMessages,
+    messages: cleanMessages,
     temperature: 0.7,
     max_tokens: 100,
   };
